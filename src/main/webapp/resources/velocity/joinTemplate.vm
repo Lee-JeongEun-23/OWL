@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<div style='text-align:center !important;font-family: \"Apple SD Gothic Neo\", \"sans-serif\" !important; border:2px solid #326295;border-radius:0.3rem; width: 540px; height: 670px;  margin: 30px auto; box-sizing: border-box;'>
+	      <div style="margin: 20px">
+	      <div > 
+				 <img src="https://i.imgur.com/qp2DjkW.png" style="width: 130px;">
+		 </div>
+		 
+	      <div style="margin-top: 40px">
+	           <img src="https://i.imgur.com/yz4OA2B.png" style="width: 150px;">
+	           <h2 class="mt-3 mb-3">${name} 님 OWL 가입을 환영합니다.</h2>
+	           <span>가입을 위한 인증을 진행해주세요.</span><br>
+	           <p>인증을 완료하려면 아래 <span style="color:#326295; font-weight: bold;"> 메일 인증하기 </span> 버튼을 눌러주세요.</p>
+	           <form action="http://192.168.6.19:8090/Project_OWL/EmailConfirmOk.do" method="post">
+					<input type="hidden" name="memberId" value="${memberId}">	    
+					<input type="submit" style=" border-radius: 0.3rem; cursor: pointer;font-weight: 900; text-align: center; background-color:#326295;color:#fff;  width:250px; height:50px;  border: 1px solid transparent;font-weight:bold;margin:30px 0px; font-size: large;" value="메일 인증하기">       
+	           </form>
+	       </div>
+	
+	        <div style="margin-top: 40px">
+	        	<span style="color: #76838f; ">본 메일은 발신 전용입니다.</span><br>
+	        	<span style="color:#76838f;">Copyright ⓒ OWL All Right Reserved</span>
+	        </div>         
+	      </div>                                                                                                                                                                                                    
+	</div>                                                                                                                                                                                                         
+</body>
+</html>

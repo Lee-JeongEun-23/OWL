@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.chat.dao.ChatDao">
+
+<select id="getMyProjectsMates" resultType="com.owl.chat.dto.MyProjectsMates">
+	select  p.projectidx, p.email, m.name, m.profilepic from owl.member m join 
+	(select projectidx, email from projectlist where projectidx in (select projectidx from projectlist where email = #{param1})) p
+        on m.email = p.email where m.name != #{param2} group by m.name  
+	</select>
+	
+<select id="getMyProjectsMatesFull" resultType="com.owl.chat.dto.MyProjectsMates">
+	select  p.projectidx, p.email, m.name, m.profilepic from owl.member m join 
+	(select projectidx, email from projectlist where projectidx in (select projectidx from projectlist where email = #{param1})) p
+        on m.email = p.email where m.email != #{param1}  
+	</select>
+	
+	
+	
+
+</mapper>

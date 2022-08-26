@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xmlns:security="http://www.springframework.org/schema/security"
+			xsi:schemaLocation="http://www.springframework.org/schema/beans 
+										  http://www.springframework.org/schema/beans/spring-beans.xsd
+										  http://www.springframework.org/schema/security 
+										  http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<security:http auto-config="true">
+		<security:csrf disabled="true" />
+		<security:form-login login-page="/Login.do" 
+										 username-parameter="email" 
+										 password-parameter="password"
+										 default-target-url="/Main.do"
+										 always-use-default-target="true"
+										 authentication-failure-handler-ref="loginFailHandler" />
+										
+		<security:logout logout-url="/Logout.do"
+									logout-success-url="/Index.do"
+								  delete-cookies="remember-cookie" 
+					         	  invalidate-session="true" />
+		
+		<security:remember-me key="rememberKey" 
+											   token-validity-seconds="604800" 
+											   remember-me-parameter="remember-me"
+											   remember-me-cookie="remember-cookie" />	
+ 	  <!--  <security:session-management invalid-session-url="/Login.do">
+	      <security:concurrency-control max-sessions="1"
+        												  	  expired-url="/Login.do" />
+	    	</security:session-management>					
+	 -->
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service users-by-username-query="SELECT EMAIL AS username, password,AUTHOK AS enabled FROM owl.MEMBER WHERE EMAIL = ?"
+															authorities-by-username-query="SELECT M.EMAIL, R.AUTHORITY FROM owl.MEMBER M JOIN owl.AUTHORITIES R ON M.EMAIL=R.EMAIL WHERE M.EMAIL= ?"
+															data-source-ref="driverManagerDataSource" />
+			<security:password-encoder ref="bCryptPasswordEncoder" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	<bean id="loginFailHandler" class="com.owl.member.handler.LoginFailHandler">
+	    <property name="email" value="email"/>
+	    <property name="password" value="password"/>
+	    <property name="errorMessage" value="errorMessage"/>
+	    <property name="defaultFailureUrl" value="/ReturnLogin.do"/>
+	</bean>
+</beans>

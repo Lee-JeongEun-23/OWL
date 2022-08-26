@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.dashBoard.dao.DashBoardDao">
+	<select id="checkJoinProject" resultType="int">
+		SELECT COUNT(PROJECTIDX) FROM owl.PROJECTLIST WHERE EMAIL = #{email}
+	</select>
+	
+	<select id="getMyIssueTasks" resultType="com.owl.dashBoard.dto.IssueTask">
+		SELECT I.ISSUEIDX, I.ISSUETITLE AS 'SUBJECT', I.DUEDATE, I.PRIORITYCODE, I.ASSIGNED, M.NAME AS 'ASSIGNEDNAME', I.PROJECTIDX, P.PROJECTNAME
+			FROM owl.ISSUE I JOIN PROJECT P ON I.PROJECTIDX = P.PROJECTIDX LEFT JOIN owl.MEMBER M ON I.ASSIGNED = M.EMAIL
+		WHERE I.ASSIGNED = #{assigned} AND I.ISSUEPROGRESS = "OPEN"  
+			ORDER BY I.DUEDATE, (CASE WHEN I.PRIORITYCODE="URGENT" THEN 1
+														  WHEN I.PRIORITYCODE="HIGH" THEN 2
+														  WHEN I.PRIORITYCODE="MEDIUM" THEN 3
+														  WHEN I.PRIORITYCODE="LOW" THEN 4
+														  ELSE 5 END)
+	</select>
+	
+	<select id="getMyIssueTasksByProject" resultType="com.owl.dashBoard.dto.IssueTask">
+		SELECT I.ISSUEIDX, I.ISSUETITLE AS 'SUBJECT', I.DUEDATE, I.PRIORITYCODE, I.ASSIGNED, M.NAME AS 'ASSIGNEDNAME', I.PROJECTIDX, P.PROJECTNAME
+			FROM owl.ISSUE I JOIN PROJECT P ON I.PROJECTIDX = P.PROJECTIDX LEFT JOIN owl.MEMBER M ON I.ASSIGNED = M.EMAIL
+		WHERE I.ASSIGNED = #{param2} AND I.PROJECTIDX = #{param1} AND I.ISSUEPROGRESS = "OPEN"  
+			ORDER BY I.DUEDATE, (CASE WHEN I.PRIORITYCODE="URGENT" THEN 1
+														  WHEN I.PRIORITYCODE="HIGH" THEN 2
+														  WHEN I.PRIORITYCODE="MEDIUM" THEN 3
+														  WHEN I.PRIORITYCODE="LOW" THEN 4
+														  ELSE 5 END)
+	</select>
+	
+	<select id="getProjectIssueTasks" resultType="com.owl.dashBoard.dto.IssueTask">
+		SELECT I.ISSUEIDX, I.ISSUETITLE AS 'SUBJECT', I.DUEDATE, I.PRIORITYCODE, I.ASSIGNED, M.NAME AS 'ASSIGNEDNAME', I.PROJECTIDX, P.PROJECTNAME
+			FROM owl.ISSUE I JOIN PROJECT P ON I.PROJECTIDX = P.PROJECTIDX LEFT JOIN owl.MEMBER M ON I.ASSIGNED = M.EMAIL
+		WHERE I.PROJECTIDX = #{projectIdx} AND I.ISSUEPROGRESS = "OPEN"  
+			ORDER BY I.DUEDATE, (CASE WHEN I.PRIORITYCODE="URGENT" THEN 1
+														  WHEN I.PRIORITYCODE="HIGH" THEN 2
+														  WHEN I.PRIORITYCODE="MEDIUM" THEN 3
+														  WHEN I.PRIORITYCODE="LOW" THEN 4
+														  ELSE 5 END)
+	</select>
+	
+	<select id="getMyProjectChart" resultType="com.owl.dashBoard.dto.ProjectProgress">
+		SELECT p.PROJECTIDX, p.PROJECTNAME, i.ASSIGNED, i.ISSUEPROGRESS , t.PROJECTCOLOR
+			FROM PROJECT p JOIN ISSUE i ON p.PROJECTIDX=i.PROJECTIDX 
+	    							  LEFT JOIN PROJECTLIST t ON p.PROJECTIDX=t.PROJECTIDX 
+	    where i.ASSIGNED = #{email} AND i.ISSUEPROGRESS in('OPEN', 'CLOSED')	 AND t.EMAIL=#{email}
+	</select>
+	
+	<select id="getProgressChart" resultType="com.owl.dashBoard.dto.ProjectProgress">
+		SELECT i.ASSIGNED, i.ISSUEPROGRESS , t.PROJECTCOLOR, t.PROJECTIDX
+			FROM PROJECTLIST t JOIN ISSUE i ON t.PROJECTIDX=i.PROJECTIDX 
+	    where i.ASSIGNED = #{param1} AND t.PROJECTIDX = #{param2} AND i.ISSUEPROGRESS in('OPEN', 'CLOSED')	
+	</select>
+	
+	<select id="getProjectChart" resultType="com.owl.dashBoard.dto.ProjectProgress">
+		SELECT PROJECTIDX, ISSUEPROGRESS, ASSIGNED FROM ISSUE WHERE PROJECTIDX =#{projectIdx} AND ISSUEPROGRESS in('OPEN', 'CLOSED')
+	</select>
+	
+	<select id="getLabelChart" resultType="com.owl.dashBoard.dto.ProjectProgress">
+		SELECT i.ISSUEIDX, i.ISSUEPROGRESS, i.PROJECTIDX, l.LABELNAME, l.LABELCOLOR
+			FROM LABEL l JOIN ISSUE i ON l.LABELIDX=i.LABELIDX 
+	    where i.PROJECTIDX = #{projectIdx} AND i.ISSUEPROGRESS in('OPEN', 'CLOSED')		
+	</select>
+	
+	<select id="getMyTimeLines" resultType="com.owl.dashBoard.dto.TimeLine">
+		SELECT P.PROJECTNAME, I.ISSUETITLE AS 'SUBJECT', I.DUEDATE, L.PROJECTCOLOR
+			FROM OWL.ISSUE I JOIN owl.PROJECT P ON I.PROJECTIDX = P.PROJECTIDX 
+										  JOIN owl.PROJECTLIST L ON P.PROJECTIDX = L.PROJECTIDX AND L.EMAIL = #{email}
+		WHERE I.DUEDATE BETWEEN DATE(NOW()) AND DATE_ADD(DATE(NOW()), INTERVAL + 7 DAY)
+			ORDER BY I.DUEDATE, P.PROJECTNAME
+	</select>
+
+	<select id="getMyTimeLinesByProject" resultType="com.owl.dashBoard.dto.TimeLine" parameterType="int">
+		SELECT distinct P.PROJECTNAME, I.ISSUETITLE AS 'SUBJECT', I.DUEDATE
+			FROM OWL.ISSUE I JOIN owl.PROJECT P ON I.PROJECTIDX = P.PROJECTIDX 
+		WHERE I.PROJECTIDX = #{projectIdx} AND I.DUEDATE BETWEEN DATE(NOW()) AND DATE_ADD(DATE(NOW()), INTERVAL + 7 DAY)
+			ORDER BY I.DUEDATE, P.PROJECTNAME
+	</select>
+
+	
+	<select id="getHorizonChart" resultType="com.owl.dashBoard.dto.ProjectProgress">
+		SELECT p.PROJECTIDX, p.PROJECTNAME, i.ISSUEPROGRESS , t.PROJECTCOLOR
+			FROM PROJECT p JOIN ISSUE i ON p.PROJECTIDX=i.PROJECTIDX 
+	    						  LEFT JOIN PROJECTLIST t ON p.PROJECTIDX=t.PROJECTIDX 
+	    where t.EMAIL = #{email} AND i.ISSUEPROGRESS in ('OPEN', 'CLOSED')	
+	</select>
+	
+	<select  id="getLineChart" resultType="com.owl.dashBoard.dto.LineChart">
+		SELECT l.LOGIDX, l.ISSUEIDX, (SELECT DATE_FORMAT(l.LOGTIME,'%Y-%m-%d') AS DATE FROM DUAL) AS 'LOGTIME', p.PROJECTCOLOR, j.PROJECTNAME, i.PROJECTIDX
+		FROM ISSUE i JOIN ISSUELOG l ON i.ISSUEIDX = l.ISSUEIDX 
+		INNER JOIN PROJECTLIST p ON p.PROJECTIDX = i.PROJECTIDX and p.email = l.creator
+		INNER JOIN PROJECT j ON j.PROJECTIDX = i.PROJECTIDX
+		WHERE l.CREATOR =#{creator} AND
+		l.LOGTIME BETWEEN DATE(l.logTime) AND DATE_ADD(DATE(l.logTime), INTERVAL + 7 DAY) ORDER BY l.LOGTIME, i.PROJECTIDX
+	</select>
+	
+	<select id="getProjectMemberProgress" resultType="com.owl.dashBoard.dto.ProjectMemberProgress" parameterType="int">
+		SELECT COUNT(CASE WHEN  I.ISSUEPROGRESS = "OPEN" THEN 1 END) AS 'OPENCOUNT'
+				, COUNT(CASE WHEN  I.ISSUEPROGRESS = "CLOSED" THEN 1 END) AS 'CLOSEDCOUNT', I.ASSIGNED, M.NAME AS 'ASSIGNEDNAME'
+			FROM ISSUE I join owl.member m on I.ASSIGNED = m.email
+		WHERE I.PROJECTIDX = #{projectIdx} AND I.ISSUEPROGRESS in('OPEN', 'CLOSED')
+			GROUP BY I.ASSIGNED;
+	</select>
+	
+	<select id="getProjectMembers" resultType="com.owl.project.dto.ProjectList" parameterType="int">
+		SELECT P.PROJECTIDX, P.EMAIL, P.FAVORITE, P.PROJECTCOLOR, P.AUTHORITY, M.NAME AS 'MEMBERNAME' 
+			FROM PROJECTLIST P JOIN owl.MEMBER M ON P.EMAIL = M.EMAIL
+		WHERE P.PROJECTIDX  = #{projectIdx}
+			ORDER BY (CASE WHEN p.authority="ROLE_PM" THEN 1 ELSE 2 END);
+	</select>
+</mapper>

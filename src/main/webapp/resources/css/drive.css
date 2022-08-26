@@ -1,0 +1,180 @@
+@charset "UTF-8";
+
+.defaultDriveMenu {
+	width: 100%;
+	background: white;
+	/*    border-bottom: 1px double #326295; */
+/* 	font-family: 'Source Sans Pro', sans-serif; */
+	padding: 15px 20px;
+}
+.driveBtn{
+	padding: 0.375rem 0.75rem;
+	border-radius: 2px;
+	width: 82px;
+	height: 35px;
+	text-align: center;
+}
+.searchDriveMenu {
+	width: 100%;
+	background: white;
+	/*    border-bottom: 1px double #326295; */
+/* 	font-family: 'Source Sans Pro', sans-serif; */
+	padding: 15px 20px;
+}
+
+.drivegroup {
+	float: right;
+	margin-top: 5px;
+	color: #326295;
+}
+.filebox input[type="file"] {
+	/* 파일 필드 숨기기 */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+#driveFile input[type="file"] {
+	/* 파일 필드 숨기기 */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+.driveCard {
+	border: 3px solid #326295;
+}
+
+.driveCard:hover .more {
+	visibility: visible;
+	opacity: 1;
+	cursor: pointer;
+}
+
+.more {
+	visibility: hidden;
+}
+
+#detail {
+	position: absolute;
+	z-index: 1;
+	border: 2px solid #e8ebed;
+	padding: 10px 10px;
+	background-color: #fff;
+}
+
+#detail li:hover {
+	background-color: #f0f3f7;
+	cursor: pointer;
+}
+
+#searchText {
+	border-right: 0px;
+	border-top: 0px;
+	boder-left: 0px;
+	boder-bottom: 3px solid #326295;
+}
+
+.progressBar {
+    width: 200px;
+    height: 22px;
+    border: 1px solid #f0f3f7;
+    border-radius: 5px; 
+    overflow: hidden;
+    display:inline-block;
+    margin:0px 10px 5px 5px;
+    vertical-align:top;
+}
+ 
+.progressBar div {
+    margin-top: 2px;
+    height: 100%;
+    color: #fff;
+    text-align: right;
+    line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+    width: 0;
+    background-color: #326295; 
+    border-radius: 3px; 
+}
+.statusbar{
+    min-height:25px;
+    width:100%;
+    padding:10px 10px 0px 10px;
+    vertical-align:top;
+}
+
+.statusbar:nth-child(odd){
+    background:#EBEFF0;
+}
+
+.filename{
+display:inline-block;
+vertical-align:top;
+width:250px;
+}
+
+.filesize{
+display:inline-block;
+vertical-align:top;
+width:100px;
+margin-left:10px;
+margin-right:5px;
+}
+
+.abort{
+  background-color:#A8352F;
+  -moz-border-radius:4px;
+  -webkit-border-radius:4px;
+  border-radius:4px;display:inline-block;
+  color:#fff;
+/*   font-family:arial; */
+  font-size:13px;
+  font-weight:normal;
+  padding:4px 15px;
+  cursor:pointer;
+  vertical-align:top;
+}
+
+.dragBorder{
+	border:2px double #326295;
+	background-color: rgba(255, 255, 255, 0.3) !important;
+	text-align:center;
+}
+.dragBorder .driveCard{
+	opacity: 0.3;
+}
+
+.fileDefaultImage{
+	height: 70px;
+}
+
+.driveViewBtn {
+	background: transparent;
+	color: #326295;
+}
+.driveViewBtn.active{
+	background: #326295;
+	color: white;
+}
+
+.dt-body-left:not(th){
+	text-align: left !important;
+}
+
+.driveUploadBox{
+	position : absolute;
+	left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+	z-index: 3;
+	opacity: 1 !important;
+}

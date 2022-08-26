@@ -1,0 +1,100 @@
+@charset "UTF-8";
+
+.hidden{
+	display: none !important;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+/*footer css 적용*/
+.main_footer {
+  background-color: #fff; 
+}
+
+.main_footer .copyright {
+  padding: 0.9375rem;
+  background: white; 
+}
+
+ .main_footer .copyright p {
+   text-align: center;
+   margin: 0;
+   color: #898989; 
+}
+
+ .main_footer .copyright a {
+   color: #326295; 
+}
+
+/* Summer note */
+.note-toolbar{
+	background-color: #f0f3f7;
+}
+
+.note-btn{
+	background-color : white !important;
+	color: black !important;
+}
+
+.priorityBadge{
+ 	font-weight: bold; 
+   	width: 63px; 
+   	font-size :13px;
+   	height : 25px;
+   	border-radius: 10rem;
+   	padding: 0.20em 0.6em;
+   	line-height: inherit;
+   	display: inline-block;
+   	text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+.priorityBadge.urgent{
+	color: #fff;
+   	background-color: red;
+   	font-weight: bold;
+}
+.urgent:after{
+	content: "Urgent"
+}
+.priorityBadge.high{
+	color: #fff;
+   	background-color: #da542e;
+   	font-weight: bold;
+}
+.high:after{
+	content: "High"
+}
+.priorityBadge.medium{
+	color: #fff;
+   	background-color: #28b779;
+   	font-weight: bold;
+}
+.medium:after{
+	content: "Medium"
+}
+.priorityBadge.low{
+	color: #fff;
+   	background-color: #ffb848;
+   	font-weight: bold;
+}
+.low:after{
+	content: "Low"
+}
+
+/* Sweet Alert */
+.swal2-icon.swal2-warning,.swal2-icon.swal2-success,.swal2-icon.swal2-error,.swal2-icon.swal2-success.swal2-success-line-tip,.swal2-icon.swal2-success.swal2-success-line-long{
+    border-color: #326295 !important;
+    color: #326295 !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring{
+	border: .25em solid rgba(50,98,149,.3) !important;
+}
+.swal2-icon.swal2-success [class^=swal2-success-line], .swal2-x-mark-line-left, .swal2-x-mark-line-right  {
+    background-color: #326295 !important;
+}
+.swal2-styled.swal2-confirm{
+	background-color: #326295 !important;
+}

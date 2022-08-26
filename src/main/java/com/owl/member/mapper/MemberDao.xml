@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.member.dao.MemberDao">
+	<select id="getMembers"  resultType="com.owl.member.dto.Member">
+		SELECT EMAIL, PASSWORD, ENABLED, NAME, PROFILEPIC, SIGNFROM, AUTHOK FROM owl.MEMBER
+	</select>
+	
+	<select id="getMember"  resultType="com.owl.member.dto.Member" parameterType="String">
+		SELECT EMAIL, PASSWORD, ENABLED, NAME, PROFILEPIC, SIGNFROM, AUTHOK FROM owl.MEMBER WHERE EMAIL = #{email}
+	</select>
+	
+	<update id="updateMember" parameterType="com.owl.member.dto.Member">		
+		UPDATE owl.MEMBER SET PASSWORD=#{password}
+								, NAME=#{name}
+								, PROFILEPIC=#{profilePic}
+		WHERE EMAIL=#{email}
+	</update>
+
+	<delete id="deleteMember">
+		DELETE FROM owl.MEMBER WHERE EMAIL=#{email}
+	</delete>
+
+
+	<insert id="insertMember" parameterType="com.owl.member.dto.Member">
+		INSERT INTO owl.MEMBER(email, password, name, profilepic, signfrom) VALUES (#{email}, #{password}, #{name}, #{profilePic}, '홈페이지')
+	</insert>
+	
+	<update id="joinMemberOk" parameterType="String">
+		UPDATE owl.MEMBER SET  AUTHOK = 1
+		WHERE EMAIL=#{email}
+	</update>
+
+	<insert id="grantDefaultRole" parameterType="String">
+		INSERT INTO owl.AUTHORITIES(email, authority) VALUES (#{email}, 'ROLE_USER')
+	</insert>
+	
+	<insert id="grantDefaultSetting" parameterType="String">
+		 insert into owl.SETTING(EMAIL, FONT, THEMECOLOR, ACTIVECOLOR) VALUES (#{email}, '굴림체', 'white', 'gray')
+	</insert>
+	
+	<select id="emailCheck" parameterType="String" resultType="com.owl.member.dto.Member">
+		SELECT * FROM owl.MEMBER WHERE email = #{email}
+	</select>
+	
+	<update id="changePassword">
+		UPDATE owl.MEMBER SET  PASSWORD = #{param2}
+		WHERE EMAIL=#{param1}
+	</update>
+	
+	<select id="getSetting" parameterType="String" resultType="com.owl.member.dto.Setting">
+		SELECT SETTINGIDX, FONT, ACTIVECOLOR, THEMECOLOR
+			FROM owl.SETTING
+		WHERE EMAIL = #{email}
+	</select>
+	
+	<update id="updateSetting">
+		UPDATE owl.SETTING SET ${param2} = #{param3}
+			WHERE EMAIL=#{param1}
+	</update>
+	
+</mapper>

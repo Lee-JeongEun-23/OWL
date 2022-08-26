@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.notice.dao.NoticeDao">
+	<insert id="insertNotice" parameterType="com.owl.notice.dto.Notice">
+		INSERT INTO owl.BOARD(EMAIL, TITLE, CONTENT, PROJECTIDX) VALUES(#{email}, #{title},#{content}, #{projectIdx})
+		<selectKey keyProperty="boardIdx" resultType="int" order ="AFTER">
+	   		select LAST_INSERT_ID()
+	 	</selectKey>
+	</insert>
+	
+	<insert id="insertNoticeFile">
+		INSERT INTO owl.File(BOARDIDX, WRITER, FILENAME, FILESIZE)
+		VALUES(#{boardIdx}, #{writer}, #{fileName}, #{fileSize})
+	</insert>
+	
+	<select id="getNoticesByProjectIdx" resultType="com.owl.notice.dto.Notice">
+		SELECT B.BOARDIDX, B.EMAIL, B.TITLE, B.CONTENT, B.WRITEDATE, B.READNUM, M.NAME
+			FROM owl.BOARD B JOIN owl.MEMBER M ON B.EMAIL = M.EMAIL
+		WHERE PROJECTIDX = #{projectIdx}
+	</select>
+	
+	<select id="getNotice" resultType="com.owl.notice.dto.Notice">
+		SELECT BOARDIDX, EMAIL, TITLE, CONTENT, WRITEDATE 
+			FROM owl.BOARD
+		WHERE BOARDIDX = #{boardIdx}
+	</select>
+	
+	<select id="getNoticeFiles" resultType="com.owl.notice.dto.File">
+		SELECT FILEIDX, BOARDIDX, WRITER, FILENAME, FILESIZE
+			FROM owl.FILE
+		WHERE BOARDIDX  = #{boardIdx}
+	</select>
+
+	<delete id="deleteNotice" parameterType="Integer">
+		DELETE FROM owl.BOARD WHERE BOARDIDX= #{noticeIdx}
+	</delete>
+	
+	<update id="updateNotice" parameterType="com.owl.notice.dto.Notice">
+		update owl.board set title = #{title}, content=#{content} where boardidx = #{boardIdx}
+	</update>
+	
+	<delete id="deleteFile" parameterType="Integer">
+		delete from owl.file where fileidx= #{fileIdx}
+	</delete>
+	
+	<update id="setReadNum" parameterType="Integer">
+		UPDATE owl.BOARD SET READNUM = (READNUM+1)
+		WHERE BOARDIDX = #{noticeIdx};
+	</update>
+</mapper>

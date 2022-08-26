@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.project.dao.ProjectDao">
+	<!-- sidebar project 목록 출력 -->
+	<select id="getProjectLists"  resultType="com.owl.project.dto.ProjectList" parameterType="String">
+		SELECT p.PROJECTIDX, p.PROJECTNAME, l.FAVORITE, l.PROJECTCOLOR, l.AUTHORITY, l.EMAIL, p.STARTDATE, p.ENDDATE FROM PROJECT p JOIN PROJECTLIST l 
+		ON p.PROJECTIDX=l.PROJECTIDX where l.EMAIL = #{email}
+	</select>
+
+	<!-- sidebar project 목록 수정 -->
+	<update id="updateProjectList" parameterType="com.owl.project.dto.ProjectList">		
+		UPDATE PROJECTLIST SET FAVORITE=#{favorite}
+								, PROJECTCOLOR=#{projectColor}
+		WHERE EMAIL=#{email} and PROJECTIDX=#{projectIdx}
+	</update>
+
+	<select id="getProjectList"  resultType="com.owl.project.dto.ProjectList" >
+		SELECT l.PROJECTIDX, p.PROJECTNAME, l.FAVORITE, l.PROJECTCOLOR, l.AUTHORITY, l.EMAIL , p.STARTDATE, p.ENDDATE
+			FROM PROJECT p JOIN PROJECTLIST l 
+		ON p.PROJECTIDX=l.PROJECTIDX where l.EMAIL = #{param2} AND l.PROJECTIDX = #{param1}
+	</select>
+	
+	<!-- sidebar project 목록 삽입 -->
+	<insert id="insertProject" parameterType="com.owl.project.dto.Project">
+		INSERT INTO PROJECT (PROJECTNAME, STARTDATE, ENDDATE) VALUES (#{projectName}, #{startDate}, #{endDate})
+	<selectKey keyProperty="projectIdx" resultType="int" order ="AFTER">
+   		select LAST_INSERT_ID()
+ 	</selectKey>
+	</insert>
+	
+	<insert id="insertProjectList" parameterType="com.owl.project.dto.ProjectList">
+		INSERT INTO PROJECTLIST (PROJECTIDX, EMAIL, PROJECTCOLOR, AUTHORITY) VALUES (#{projectIdx}, #{email}, #{projectColor}, #{authority})	
+	</insert>
+	
+	<insert id="insertProjectMember" parameterType="com.owl.project.dto.ProjectList">
+		INSERT INTO PROJECTLIST (PROJECTIDX, EMAIL, PROJECTCOLOR, AUTHORITY) VALUES (#{projectIdx}, #{email}, #{projectColor}, #{authority})	
+	</insert>
+	
+	<select id="getProjectMembers"  resultType="com.owl.member.dto.Member" >
+		SELECT  M.EMAIL, M.NAME, M.PROFILEPIC, P.AUTHORITY
+			FROM owl.projectlist P JOIN OWL.MEMBER M ON P.EMAIL = M.EMAIL
+		WHERE P.PROJECTIDX = #{projectIdx}
+		ORDER BY P.AUTHORITY
+	</select>
+	
+	<delete id="outProject" >
+		DELETE FROM owl.PROJECTLIST WHERE PROJECTIDX = #{param1} AND EMAIL = #{param2}
+	</delete>
+	<update id="grantPM">
+		update owl.projectlist set authority='ROLE_PM' where  PROJECTIDX = #{param1} AND EMAIL = #{param2} 
+	</update>
+	<update id="grantProjectMember">
+		update owl.projectlist set authority='ROLE_PROJECTMEMBER' where  PROJECTIDX = #{param1} AND EMAIL = #{param2} 
+	</update>
+</mapper>

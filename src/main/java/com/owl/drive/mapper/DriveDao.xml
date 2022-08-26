@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.drive.dao.DriveDao">
+	<insert id="insertMainFolder" parameterType="com.owl.drive.dto.DriveFolder">
+		INSERT INTO DRIVEFOLDER(FOLDERNAME, REF, DEPTH, PROJECTIDX) 
+		VALUES(#{folderName}, #{ref}, #{depth}, #{projectIdx});
+		<selectKey resultType="int" keyProperty="driveIdx" order="AFTER">
+        	SELECT LAST_INSERT_ID()
+    	</selectKey>
+	</insert>
+	
+	<insert id="insertFolder" parameterType="com.owl.drive.dto.DriveFolder">
+		INSERT INTO DRIVEFOLDER(FOLDERNAME, REF, DEPTH, PROJECTIDX) 
+		VALUES(#{folderName}, #{ref}, (SELECT COALESCE(MAX(D.depth),0)+1 FROM DRIVEFOLDER D WHERE REF=#{ref}) , #{projectIdx});
+		<selectKey resultType="int" keyProperty="driveIdx" order="AFTER">
+        	SELECT LAST_INSERT_ID()
+    	</selectKey>
+	</insert>
+	
+	<insert id="insertFile" parameterType="com.owl.drive.dto.DriveFile">
+		INSERT INTO owl.DRIVEFILE (FILENAME, FILESIZE, CREATOR, DRIVEIDX) 
+		VALUES(#{fileName}, #{fileSize}, #{creator}, #{driveIdx})
+	</insert>	
+
+	<select id="getDriveList"  resultType="com.owl.drive.dto.DriveFolder" parameterType="int">
+		SELECT DRIVEIDX, FOLDERNAME, REF, DEPTH, PROJECTIDX FROM DRIVEFOLDER WHERE PROJECTIDX = #{projectIdx} AND ISDELETE = 0;
+	</select>
+	
+	<select id="getFileByFolderIdx" resultType="com.owl.drive.dto.DriveFile" parameterType="int">
+		SELECT DRIVEFILEIDX, FILENAME, CREATOR, M.NAME AS 'CREATORNAME', FILESIZE, CREATEDATE 
+			FROM owl.DRIVEFILE F JOIN owl.MEMBER M ON F.CREATOR = M.EMAIL
+		WHERE DRIVEIDX = #{folderIdx} AND ISDELETE = 0
+	</select>
+	
+	<select id="getFolderByFolderIdx" resultType="com.owl.drive.dto.DriveFolder" parameterType="int">
+		SELECT DRIVEIDX, FOLDERNAME FROM owl.DRIVEFOLDER WHERE REF = #{folderIdx} AND ISDELETE = 0
+	</select>
+
+	
+	<update id="updateNewNameFolder">
+		UPDATE DRIVEFOLDER SET FOLDERNAME =#{param1}
+		WHERE DRIVEIDX =#{param2}
+	</update>
+	
+	<update id="updateFolder" parameterType="com.owl.drive.dto.DriveFolder">
+			UPDATE DRIVEFOLDER SET FOLDERNAME =#{folderName}
+													,REF =#{ref}
+													,DEPTH =(SELECT DEPTH FROM (SELECT COALESCE(MAX(depth),0)+1 FROM DRIVEFOLDER WHERE REF=43) AS TEMP)
+			WHERE DRIVEIDX =#{driveIdx}
+	</update>
+
+
+	<select id="getFileListinTrash" resultType="com.owl.drive.dto.DriveFile" parameterType="int">
+	SELECT F.DRIVEFILEIDX, F.FILENAME, F.CREATOR, M.NAME AS 'CREATORNAME', F.FILESIZE, F.CREATEDATE, F.DRIVEIDX
+		FROM PROJECT P LEFT JOIN DRIVEFOLDER D ON P.PROJECTIDX = D.PROJECTIDX 
+              		   				LEFT JOIN DRIVEFILE F ON D.DRIVEIDX = F.DRIVEIDX
+   		                         	LEFT JOIN owl.MEMBER M ON F.CREATOR = M.EMAIL
+		WHERE F.ISDELETE = 1 AND P.PROJECTIDX = #{projectIdx};
+	</select>
+	
+	
+	<select id="getFolderListinTrash" resultType="com.owl.drive.dto.DriveFolder" parameterType="int">
+		SELECT D.DRIVEIDX, D.FOLDERNAME, D.REF, D.DEPTH, D.PROJECTIDX
+		FROM PROJECT P LEFT JOIN DRIVEFOLDER D ON P.PROJECTIDX = D.PROJECTIDX 
+		WHERE D.ISDELETE = 1 AND P.PROJECTIDX = #{projectIdx};
+	</select>
+	
+	
+	<select id="getTrashList" resultType="com.owl.drive.dto.DriveFile" parameterType="int">
+	SELECT F.DRIVEFILEIDX, F.FILENAME, F.CREATOR, F.FILESIZE, F.CREATEDATE, F.DRIVEIDX
+		FROM PROJECT P LEFT JOIN DRIVEFOLDER D ON P.PROJECTIDX = D.PROJECTIDX 
+              		   LEFT JOIN DRIVEFILE F ON D.DRIVEIDX = F.DRIVEIDX
+		WHERE F.ISDELETE = 1 AND P.PROJECTIDX = #{projectIdx};
+	</select>
+	
+	<update id="deleteFolderFromDrive" parameterType="int">
+		UPDATE DRIVEFOLDER SET ISDELETE = 1, DELETEDATE = CURRENT_TIMESTAMP
+		WHERE  DRIVEIDX = #{driveIdx}
+	</update>
+	
+	<update id="deleteFoldersFromDrive" parameterType="String">
+		UPDATE DRIVEFOLDER SET ISDELETE = 1, DELETEDATE = CURRENT_TIMESTAMP
+		WHERE  DRIVEIDX IN (#{driveIdxList})
+	</update>
+	
+	<update id="deleteFilesFromDrive" parameterType="String">
+		UPDATE DRIVEFILE SET ISDELETE = 1, DELETEDATE = CURRENT_TIMESTAMP
+		WHERE  DRIVEFILEIDX IN (#{driveFileIdxList})
+	</update>
+	
+	<update id="deleteFileFromDrive" parameterType="int">
+		UPDATE owl.DRIVEFILE SET ISDELETE = 1, DELETEDATE = CURRENT_TIMESTAMP
+		WHERE  DRIVEFILEIDX = #{driveFileIdx}
+	</update>
+	
+	<delete id="deleteFileFromTrash" parameterType="int">
+		DELETE FROM owl.DRIVEFILE WHERE DRIVEFILEIDX = #{driveFileIdx}
+	</delete>
+	
+	
+	<delete id="deleteFolderFromTrash" parameterType="int">
+		DELETE FROM owl.drivefolder WHERE DRIVEIDX = #{driveFileIdx}
+	</delete>
+	
+	
+	<update id="renameFile">
+		UPDATE owl.DRIVEFILE SET 	FILENAME = #{param2}
+		WHERE  DRIVEFILEIDX = #{param1}
+	</update>
+	
+	<update id="restoreFilefromTrash">
+		UPDATE DRIVEFILE SET ISDELETE = 0 WHERE DRIVEFILEIDX = #{drivefileIdx}
+	</update>
+	
+	<update id="restoreFolderfromTrash">
+		UPDATE DRIVEFOLDER SET ISDELETE = 0 WHERE DRIVEIDX = #{drivefileIdx}
+	</update>
+	
+	<select id="getFileName" resultType="String" parameterType="int">
+		SELECT FILENAME FROM owl.DRIVEFILE where DRIVEFILEIDX = #{drivefileIdx}
+	</select>
+	
+</mapper>

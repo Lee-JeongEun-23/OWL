@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.owl.kanban.dao.KanbanDao">
+
+<!-- 	<select id="selectProjectMember" resultType="com.owl.member.dto" parameterType="int">
+		SELECT * FROM projectlist where projectidx = #{projectidx}
+	</select> -->
+	
+	<insert id="insertColumn" parameterType="com.owl.kanban.dto.Column">
+		INSERT INTO owl.colname(colname, projectidx) VALUE(#{colname}, #{projectIdx})
+		<selectKey keyProperty="colIdx" resultType="int" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<insert id="insertIssue" parameterType="com.owl.kanban.dto.Issue">
+		INSERT INTO owl.ISSUE(ordernum, creator, issuetitle, content, issueprogress, projectidx, duedate, prioritycode, assigned, labelidx, colidx) 
+		VALUES(#{orderNum}, #{creator}, #{issueTitle}, #{content}, #{issueProgress}, #{projectIdx}
+					, #{dueDate, jdbcType=DATE} , #{priorityCode, jdbcType=VARCHAR}, #{assigned, jdbcType=VARCHAR}
+					, <choose>
+					    <when test="labelIdx != 0"> #{labelIdx} </when>
+					    <otherwise> null </otherwise>
+					  </choose>
+					 
+					 , <choose> 
+						<when test="colIdx != 0"> #{colIdx} </when>
+					    <otherwise> null </otherwise>
+					  </choose>
+					)
+		<selectKey keyProperty="issueIdx" resultType="int" order ="AFTER">
+	   		select LAST_INSERT_ID()
+	 	</selectKey>
+	</insert>
+
+
+	<insert id="insertIssueFile" >
+		INSERT INTO owl.File(ISSUEIDX, WRITER, FILENAME, FILESIZE)
+		VALUES(#{issueIdx}, #{writer}, #{fileName}, #{fileSize})
+	</insert>
+
+
+	<update id="updateAllIncrease">
+		update issue a set ordernum = ordernum + 1 where projectidx = #{param1} and colidx= -1 and issueidx not in (#{param2})
+
+	</update>
+
+	<insert id="insertLabel" parameterType="com.owl.project.dto.Label">
+		INSERT INTO owl.label(projectidx, labelcolor, labelname) VALUE(#{projectIdx}, #{labelColor}, #{labelName})
+			<selectKey keyProperty="labelIdx" resultType="int" order="AFTER">
+				SELECT LAST_INSERT_ID()
+			</selectKey>
+	</insert>
+
+	<select id="getLabelList" resultType="com.owl.project.dto.Label">
+		select labelidx, labelname, labelcolor from label WHERE projectidx = #{projectIdx}
+	</select>
+	
+	
+	<select id="getLabelinfo" resultType="com.owl.project.dto.Label">
+		select  labelname, labelcolor from label WHERE labelIdx = #{labelIdx}
+	</select>
+	
+	<select id="getColumn" resultType="com.owl.kanban.dto.Column">
+  		select projectIdx, colidx, colname from colname where projectidx=#{projectIdx}
+	</select>
+	
+	<select id="getIssue" resultType="com.owl.kanban.dto.Issue">
+		SELECT i.PROJECTIDX, i.ISSUETITLE, i.ISSUEIDX, i.ASSIGNED, M.NAME, i.ISSUEPROGRESS,i.duedate ,i.prioritycode, i.colidx, i.labelidx, L.LABELNAME, L.LABELCOLOR
+		FROM ISSUE I LEFT JOIN label l on i.projectidx = l.projectidx and I.LABELIDX = L.LABELIDX 
+					  LEFT JOIN owl.member M ON I.ASSIGNED = M.EMAIL
+		where i.projectidx=#{projectIdx} AND (I.ISSUEPROGRESS = "OPEN" OR I.ISSUEPROGRESS = "CLOSED") order by ordernum
+	</select>
+	
+	<select id="getIssuebyIssueIdx" resultType="com.owl.kanban.dto.Issue">
+<!-- 		SELECT I.PROJECTIDX, I.CONTENT, I.ISSUETITLE,  I.ISSUEIDX, I.ASSIGNED,i.issueprogress,L.LABELNAME, L.LABELCOLOR, 
+		l.labelidx, I.DUEDATE, I.PRIORITYCODE, I.CREATOR, I.ORDERNUM, I.COLIDX
+			FROM ISSUE I LEFT JOIN LABEL L  ON I.LABELIDX = L.LABELIDX
+		WHERE I.ISSUEIDX=#{param1} -->
+		SELECT I.PROJECTIDX, I.CONTENT, I.ISSUETITLE,  I.ISSUEIDX, I.ASSIGNED, I.issueprogress, L.LABELNAME, L.LABELCOLOR, 
+		L.labelidx, I.DUEDATE, I.PRIORITYCODE, I.CREATOR, M.NAME, I.ORDERNUM, I.COLIDX
+		FROM ISSUE I LEFT JOIN LABEL L  ON I.LABELIDX = L.LABELIDX
+				     LEFT JOIN owl.member M ON I.ASSIGNED = M.EMAIL
+        WHERE I.ISSUEIDX=#{param1};
+		
+	</select>
+	
+	<select id="getIssueFiles" resultType="com.owl.notice.dto.File">
+		SELECT FILEIDX, ISSUEIDX, WRITER, FILENAME, FILESIZE 
+			FROM owl.FILE
+		WHERE ISSUEIDX  = #{issueIdx}
+	</select>
+	
+	<select id="getIssueLogs" resultType="com.owl.kanban.dto.IssueLog">
+		SELECT LOGIDX, LOG, LOGTIME, ISSUEIDX, creator , M.NAME AS 'CREATORNAME'
+			FROM owl.ISSUELOG L JOIN OWL.MEMBER M ON L.CREATOR = M.EMAIL
+		WHERE ISSUEIDX = #{issueIdx}
+	</select>
+	
+	<select id="getIssueReplies" resultType="com.owl.kanban.dto.Reply">
+		SELECT R.ISSUEIDX, R.ISSUERLYIDX, R.CREATEDATE, M.name as 'CREATORNAME', R.CREATOR, R.CONTENT, M.profilepic
+			FROM owl.ISSUERLY R LEFT JOIN owl.member M on R.creator = M.email
+		WHERE R.ISSUEIDX = #{issueIdx}
+	</select>
+
+	<update id="updateColumn" parameterType="com.owl.kanban.dto.Column">
+		UPDATE COLNAME SET COLNAME = #{colname} WHERE PROJECTIDX = #{projectIdx} AND COLIDX=#{colIdx}
+	</update>
+	
+	<delete id="deleteColumn">
+		DELETE FROM COLNAME WHERE COLIDX =#{colIdx}
+	</delete>
+	
+	<delete id="deleteIssue">
+		DELETE FROM ISSUE WHERE ISSUEIDX =#{issueIdx}
+	</delete>
+	
+	<update id="updateMoveIssue" parameterType="map">
+		UPDATE owl.ISSUE SET COLIDX = #{colIdx} ,  ORDERNUM = (#{index}+1)
+		WHERE ISSUEIDX = #{issueIdx}
+	</update>
+
+	<delete id="deleteLabel">
+		DELETE FROM LABEL WHERE LABELIDX =#{labelIdx}
+	</delete>	
+	
+	<update id="updateLabel" parameterType="com.owl.project.dto.Label">
+		UPDATE LABEL SET LABELNAME = #{labelName}, LABELCOLOR =#{labelColor} WHERE LABELIDX = #{labelIdx}
+	</update>
+	
+	<insert id="insertIssueLog">
+		INSERT INTO owl.ISSUELOG (ISSUEIDX, LOG, CREATOR) values(#{param1}, #{param2}, #{param3})
+	</insert>
+	
+	<update id="closeIssue" >
+		update issue set colidx = -99 , issueprogress='CLOSED'  where issueidx = #{issueIdx}
+	</update>
+	
+	<update id="reopenIssue" >
+		update issue set colidx = #{param2} , issueprogress='OPEN' where issueidx = #{param1}
+	</update>
+	
+	<select id="getColumnName" resultType="String">
+		SELECT COLNAME FROM owl.COLNAME WHERE PROJECTIDX= #{param1} AND COLIDX= #{param2}
+	</select>
+	
+	
+	<insert id="insertReply" parameterType="com.owl.kanban.dto.Reply">
+		INSERT INTO issuerly(issueidx, content, creator) VALUE(#{issueIdx}, #{content}, #{creator})
+		<selectKey keyProperty="issueRlyIdx" resultType="int" order ="AFTER">
+	   		select LAST_INSERT_ID()
+	 	</selectKey>
+	</insert>
+	
+	<select id="getReply" resultType="com.owl.kanban.dto.Reply">
+		SELECT CONTENT, CREATEDATE, CREATOR, ISSUEIDX FROM ISSUERLY WHERE issueRlyIdx = #{issueRlyIdx}
+	</select>
+	
+	<delete id="deleteReply">
+		DELETE FROM issuerly WHERE issuerlyidx =#{issuerlyidx}
+	</delete>	
+
+	<update id="updateReply" parameterType="com.owl.kanban.dto.Reply">
+		UPDATE ISSUERLY SET content = #{content} WHERE ISSUERLYIDX = #{issueRlyIdx}
+	</update>
+	
+	<select id="searchAssignee" resultType="com.owl.kanban.dto.Issue">
+	 SELECT i.PROJECTIDX, i.ISSUETITLE, i.ISSUEIDX, i.ASSIGNED, i.labelidx, i.prioritycode, i.duedate, L.LABELNAME, L.LABELCOLOR
+		FROM ISSUE  I left join label l on i.projectidx = l.projectidx and I.LABELIDX = L.LABELIDX 
+        where i.projectidx=#{param1} and assigned = #{param2} order by ordernum
+	</select>
+	
+	<select id="searchLabel" resultType="com.owl.kanban.dto.Issue">
+	 SELECT i.PROJECTIDX, i.ISSUETITLE, i.ISSUEIDX, i.ASSIGNED, i.labelidx, i.prioritycode, i.duedate, L.LABELNAME, L.LABELCOLOR
+		FROM ISSUE  I left join label l on i.projectidx = l.projectidx and I.LABELIDX = L.LABELIDX 
+        where l.labelidx = #{labelIdx} order by ordernum
+	</select>	
+	
+	<select id="searchPriority" resultType="com.owl.kanban.dto.Issue">
+	 SELECT i.PROJECTIDX, i.ISSUETITLE, i.ISSUEIDX, i.ASSIGNED, i.labelidx, i.prioritycode, i.duedate, L.LABELNAME, L.LABELCOLOR
+		FROM ISSUE  I left join label l on i.projectidx = l.projectidx and I.LABELIDX = L.LABELIDX 
+        where i.prioritycode = #{priorityidx} order by ordernum
+	</select>
+	
+	<update id="updateIssueTitle" parameterType="com.owl.kanban.dto.Issue">
+		update issue set issuetitle=#{issueTitle} where issueidx= #{issueIdx}
+	</update>
+	
+	<update id="updateIssueContent" parameterType="com.owl.kanban.dto.Issue">
+		update issue set content=#{content} where issueidx= #{issueIdx}
+	</update>
+	<update id="updateIssuePriority">
+		update issue set prioritycode=#{priorityCode} where issueidx= #{issueIdx}
+	</update>
+	
+	<update id="updateIssueDueDate" parameterType="com.owl.kanban.dto.Issue">
+		update issue set duedate=#{dueDate, jdbcType=DATE} where issueidx= #{issueIdx}
+	</update>
+	
+	<update id="updateIssueAssigned" parameterType="com.owl.kanban.dto.Issue">
+		update issue set assigned=#{assigned} where issueidx= #{issueIdx}
+	</update>
+	<update id="updateIssueLabel" parameterType="com.owl.kanban.dto.Issue">
+		update issue set labelidx=
+					<choose>
+					    <when test="labelIdx != 0"> #{labelIdx} </when>
+					    <otherwise> null </otherwise>
+					</choose> where issueidx= #{issueIdx}
+	</update>
+	<delete id="deleteIssueFile">
+		delete from owl.file where fileidx= #{param1}
+	</delete>
+	
+	<select id="getPMemail" resultType="String">
+		select email from projectlist where authority = 'ROLE_PM' AND PROJECTIDX=#{projectIdx}
+	</select>
+	
+   <update id="IssueComfirmfromPM" parameterType="int">
+      update issue set issueprogress = "OPEN" where issueIdx = #{issueIdx}
+   </update>
+   
+   
+ <update id="IssueRejectfromPM" parameterType="com.owl.kanban.dto.Issue">
+      update issue set issueprogress = "REQUESTED", rejectreason = #{rejectreason} where issueIdx = #{issueIdx}
+   </update> 
+   
+   
+   	<select id="GetcomfirmReason" resultType="String">
+		select rejectreason from issue where issueIdx=#{issueIdx}
+	</select>
+   
+	
+</mapper>

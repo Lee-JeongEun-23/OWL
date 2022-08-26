@@ -1,0 +1,59 @@
+@charset "UTF-8";
+/*Join Project*/
+.snsLoginButton {
+	background-color: transparent;
+	border: none;
+	width: 50px;
+	height: 50px;
+	cursor: pointer;
+}
+
+.vertical-center {
+	min-height: 100%;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+}
+
+body.max {
+	background-color: #326295;
+	overflow-y: hidden;
+}
+
+.roundBox {
+	background-color: white;
+	border-radius: 15px;
+}
+
+.loginButton {
+	padding: 15px 40px;
+	background: #326295;
+	font-weight: 700;
+	color: white;
+}
+
+#loginBox input[type=text],
+#loginBox input[type=email],
+#loginBox input[type=password],
+#joinBox input[type=text],
+#joinBox input[type=email],
+#joinBox input[type=password] {
+	border-top-width: 0px;
+	border-left-width: 0px;
+	border-right-width: 0px;
+}
+		
+/*Reset Password*/
+#forgotPwdBody {
+    background-color: #326295;
+    overflow-y: hidden;
+    height: 100vh !important;
+}
+
+.forgotBox {
+    border-radius: 15px;
+}
+
+.forgotButton {
+    padding: 10px;
+}

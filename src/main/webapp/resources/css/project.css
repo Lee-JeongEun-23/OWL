@@ -1,0 +1,70 @@
+@charset "UTF-8";
+
+/* 탭 css */
+#tab-menu {
+	width: 100%;
+	background: white;
+	border-bottom: 1px double #326295;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+#tab-btn ul {
+	overflow: hidden;
+	margin-bottom: 0px;
+}
+
+#tab-btn li {
+	float: left;
+	width: 150px;
+	text-align: center;
+}
+
+#tab-btn li a {
+	display: block;
+	color: #326295;
+	padding: 15px 20px;
+	font-weight: bold;
+}
+
+#tab-btn li.active a {
+	border-bottom: 3px solid #326295;
+	color: #326295;
+}
+
+.dataTable tbody tr.selecteds {
+	color: white;
+	background-color: #326295;
+	opacity: 0.5;
+}
+
+.roleBadge {
+	font-weight: bold;
+	width: 63px;
+	font-size: 13px;
+	height: 25px;
+	border-radius: 10rem;
+	padding: 0.20em 0.6em;
+	line-height: normal;
+	display: inline-block;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+}
+
+.roleBadge.pm {
+	color: #fff;
+	background-color: #2255a4;
+}
+
+.pm:after {
+	content: "PM";
+}
+
+.roleBadge.member {
+	color: #212529;
+	background-color: #ffb848;
+}
+
+.member:after {
+	content: "Member";
+}
